@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,93 +8,160 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
   <style>
-    :root, [data-theme="light"] {
-      --color-bg:#f7f6f2; --color-surface:#f0ede8; --color-surface-2:#e8e4de;
-      --color-text:#28251d; --color-text-muted:#7a7974; --color-primary:#b00020; --color-primary-hover:#8a0019;
-      --radius-sm:.375rem; --radius-lg:.75rem; --radius-xl:1rem; --radius-full:9999px;
-      --font-display:'Instrument Serif', Georgia, serif; --font-body:'Work Sans', sans-serif;
-      --text-sm:clamp(.875rem,.8rem + .35vw,1rem); --text-base:clamp(1rem,.95rem + .25vw,1.125rem);
-      --text-lg:clamp(1.125rem,1rem + .75vw,1.5rem); --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
-      --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-6:1.5rem; --space-8:2rem;
-      --shadow:0 12px 40px rgba(0,0,0,.12); --transition:180ms cubic-bezier(0.16, 1, 0.3, 1);
+    :root {
+      --bg: #151214;
+      --surface: #1d181b;
+      --surface-2: #281f24;
+      --text: #f0e8eb;
+      --muted: #b8aab0;
+      --primary: #dc052d;
+      --primary-hover: #a8001d;
+      --radius: 20px;
+      --radius-sm: 12px;
     }
-    [data-theme="dark"] {
-      --color-bg:#151214; --color-surface:#1d181b; --color-surface-2:#281f24;
-      --color-text:#f0e8eb; --color-text-muted:#b8aab0; --color-primary:#dc052d; --color-primary-hover:#a8001d;
-      --shadow:0 12px 40px rgba(0,0,0,.45);
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at top, rgba(220,5,45,.18), transparent 35%), var(--bg);
+      color: var(--text);
+      font-family: "Work Sans", sans-serif;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{min-height:100dvh;font-family:var(--font-body);background:radial-gradient(circle at top, rgba(220,5,45,.18), transparent 35%), var(--color-bg);color:var(--color-text);display:grid;place-items:center;padding:var(--space-8)}
-    .wrap{width:min(100%,540px)}
-    .card{background:var(--color-surface);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:var(--space-8);box-shadow:var(--shadow)}
-    .badge{display:inline-flex;gap:.5rem;align-items:center;padding:.45rem .8rem;border-radius:var(--radius-full);background:rgba(220,5,45,.12);color:var(--color-primary);font-size:var(--text-sm);margin-bottom:var(--space-4)}
-    h1{font-family:var(--font-display);font-size:var(--text-xl);margin-bottom:var(--space-2)}
-    p{color:var(--color-text-muted);margin-bottom:var(--space-6);line-height:1.6}
-    .visual{aspect-ratio:1;border-radius:var(--radius-lg);background:linear-gradient(135deg, rgba(220,5,45,.2), rgba(220,5,45,.04));display:grid;place-items:center;margin-bottom:var(--space-6);border:1px solid rgba(255,255,255,.08)}
-    .rings{position:relative;width:180px;height:180px;border-radius:50%;display:grid;place-items:center}
-    .ring,.ring2,.disc{position:absolute;border-radius:50%}
-    .ring{inset:0;border:2px solid rgba(220,5,45,.35)}
-    .ring2{inset:18px;border:2px solid rgba(220,5,45,.2)}
-    .disc{inset:42px;background:var(--color-primary);box-shadow:0 0 40px rgba(220,5,45,.35)}
-    .eq{display:flex;gap:4px;align-items:flex-end;height:44px;position:absolute}
-    .eq span{width:6px;background:#fff;border-radius:4px;height:12px;opacity:.9;animation:jump .8s ease-in-out infinite alternate;animation-play-state:paused}
-    .eq span:nth-child(2){height:24px;animation-duration:.5s}.eq span:nth-child(3){height:18px;animation-duration:.7s}.eq span:nth-child(4){height:30px;animation-duration:.45s}.eq span:nth-child(5){height:14px;animation-duration:.65s}
-    .playing .eq span{animation-play-state:running}
-    @keyframes jump{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
-    .title{font-size:var(--text-lg);font-weight:600;margin-bottom:.35rem}
-    .meta{font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-4)}
-    .bar{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;cursor:pointer;margin-bottom:.5rem}
-    .fill{height:100%;width:0;background:var(--color-primary)}
-    .times{display:flex;justify-content:space-between;font-size:.9rem;color:var(--color-text-muted);font-variant-numeric:tabular-nums;margin-bottom:var(--space-6)}
-    .controls{display:flex;justify-content:center;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)}
-    .btn{width:56px;height:56px;border:none;border-radius:50%;background:var(--color-primary);color:white;display:grid;place-items:center;cursor:pointer;transition:transform var(--transition),background var(--transition)}
-    .btn:hover{background:var(--color-primary-hover)} .btn:active{transform:scale(.95)}
-    .btn.secondary{width:42px;height:42px;background:rgba(255,255,255,.07);color:var(--color-text)}
-    .volume{display:flex;align-items:center;gap:var(--space-3)}
-    input[type=range]{width:100%}
-    .hint{margin-top:var(--space-6);font-size:.95rem;color:var(--color-text-muted)}
+
+    .player {
+      width: min(100%, 420px);
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+    }
+
+    .cover {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(220,5,45,.22), rgba(220,5,45,.04));
+      display: grid;
+      place-items: center;
+      margin-bottom: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .disc {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 40px rgba(220,5,45,.35);
+    }
+
+    h1 {
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(1.8rem, 1.3rem + 1vw, 2.4rem);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .bar {
+      height: 8px;
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0;
+      background: var(--primary);
+    }
+
+    .times {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 22px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .play {
+      width: 64px;
+      height: 64px;
+      border: none;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .play:hover {
+      background: var(--primary-hover);
+    }
+
+    .volume {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .volume input {
+      width: 100%;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
-      <div class="badge">Nur ein Titel</div>
-      <h1>FC Bayern Goal Song</h1>
-      <p>Diese statische Seite spielt ausschließlich die eingebundene Audiodatei ab.</p>
-      <div class="visual" id="visual">
-        <div class="rings">
-          <div class="ring"></div><div class="ring2"></div><div class="disc"></div>
-          <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
-        </div>
-      </div>
-      <div class="title">Fc-Bayern Goal Song</div>
-      <div class="meta">Lokale Datei im Projekt eingebunden</div>
-      <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
-      <div class="times"><span id="current">0:00</span><span id="total">0:00</span></div>
-      <div class="controls">
-        <button class="btn secondary" id="restart" aria-label="Neu starten">↺</button>
-        <button class="btn" id="toggle" aria-label="Abspielen oder pausieren">▶</button>
-      </div>
-      <div class="volume">
-        <span>🔊</span>
-        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Lautstärke">
-      </div>
-      <div class="hint">Leertaste = Play/Pause, Pfeiltasten links/rechts = 5 Sekunden springen.</div>
-      <audio id="audio" preload="metadata">
-        <source src="./Fc-Bayern-_NEW_-Goal-song.mp3" type="audio/mpeg">
-      </audio>
-    </section>
+  <main class="player">
+    <div class="cover">
+      <div class="disc"></div>
+    </div>
+
+    <h1>FC Bayern Goal Song</h1>
+
+    <div class="bar" id="bar">
+      <div class="fill" id="fill"></div>
+    </div>
+
+    <div class="times">
+      <span id="current">0:00</span>
+      <span id="total">0:00</span>
+    </div>
+
+    <div class="controls">
+      <button class="play" id="toggle" aria-label="Abspielen oder pausieren">▶</button>
+    </div>
+
+    <div class="volume">
+      <span>🔊</span>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Lautstärke">
+    </div>
+
+    <audio id="audio" preload="metadata">
+      <source src="/Fc-Bayern-_NEW_-Goal-song.mp3" type="audio/mpeg">
+    </audio>
   </main>
+
   <script>
     const audio = document.getElementById('audio');
     const toggle = document.getElementById('toggle');
-    const restart = document.getElementById('restart');
     const volume = document.getElementById('volume');
     const fill = document.getElementById('fill');
     const bar = document.getElementById('bar');
     const current = document.getElementById('current');
     const total = document.getElementById('total');
-    const visual = document.getElementById('visual');
 
     const fmt = s => {
       if (isNaN(s)) return '0:00';
@@ -103,10 +170,8 @@
       return `${m}:${String(sec).padStart(2, '0')}`;
     };
 
-    const syncButton = () => {
-      const playing = !audio.paused;
-      toggle.textContent = playing ? '❚❚' : '▶';
-      visual.classList.toggle('playing', playing);
+    const sync = () => {
+      toggle.textContent = audio.paused ? '▶' : '❚❚';
     };
 
     toggle.addEventListener('click', async () => {
@@ -115,19 +180,12 @@
       } else {
         audio.pause();
       }
-      syncButton();
+      sync();
     });
 
-    restart.addEventListener('click', () => {
-      audio.currentTime = 0;
-      if (audio.paused) {
-        audio.play().then(syncButton);
-      } else {
-        syncButton();
-      }
+    volume.addEventListener('input', () => {
+      audio.volume = volume.value;
     });
-
-    volume.addEventListener('input', () => audio.volume = volume.value);
 
     audio.addEventListener('loadedmetadata', () => {
       total.textContent = fmt(audio.duration);
@@ -139,26 +197,15 @@
       current.textContent = fmt(audio.currentTime);
     });
 
-    audio.addEventListener('play', syncButton);
-    audio.addEventListener('pause', syncButton);
-    audio.addEventListener('ended', syncButton);
+    audio.addEventListener('play', sync);
+    audio.addEventListener('pause', sync);
+    audio.volume = 0.8;
 
     bar.addEventListener('click', e => {
       const rect = bar.getBoundingClientRect();
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       if (audio.duration) audio.currentTime = pct * audio.duration;
     });
-
-    document.addEventListener('keydown', e => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        toggle.click();
-      }
-      if (e.code === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
-      if (e.code === 'ArrowRight') audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
-    });
-
-    audio.volume = 0.8;
   </script>
 </body>
 </html>
