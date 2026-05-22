@@ -3,23 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FC Bayern Goal Song</title>
+  <title>Torhymnen Player</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #151214;
-      --surface: #1d181b;
-      --surface-2: #281f24;
-      --text: #f0e8eb;
-      --muted: #b8aab0;
-      --primary: #dc052d;
-      --primary-hover: #a8001d;
-      --radius: 20px;
-      --radius-sm: 12px;
-    }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -27,48 +15,39 @@
       display: grid;
       place-items: center;
       padding: 24px;
-      background: radial-gradient(circle at top, rgba(220,5,45,.18), transparent 35%), var(--bg);
-      color: var(--text);
       font-family: "Work Sans", sans-serif;
+      background: #111;
+      color: #f0f0f0;
     }
 
     .player {
       width: min(100%, 420px);
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
+      border-radius: 20px;
       padding: 28px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+      box-shadow: 0 18px 45px rgba(0,0,0,.45);
+      text-align: center;
     }
 
     .cover {
       aspect-ratio: 1;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, rgba(220,5,45,.22), rgba(220,5,45,.04));
+      border-radius: 14px;
       display: grid;
       place-items: center;
       margin-bottom: 22px;
       border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .disc {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 40px rgba(220,5,45,.35);
+      font-size: 5rem;
     }
 
     h1 {
       font-family: "Instrument Serif", serif;
-      font-size: clamp(1.8rem, 1.3rem + 1vw, 2.4rem);
-      margin-bottom: 18px;
-      text-align: center;
+      font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2.2rem);
+      margin-bottom: 22px;
+      line-height: 1.2;
     }
 
     .bar {
       height: 8px;
-      background: rgba(255,255,255,.08);
+      background: rgba(255,255,255,.1);
       border-radius: 999px;
       overflow: hidden;
       cursor: pointer;
@@ -78,14 +57,15 @@
     .fill {
       height: 100%;
       width: 0;
-      background: var(--primary);
+      border-radius: 999px;
+      transition: width .1s linear;
     }
 
     .times {
       display: flex;
       justify-content: space-between;
-      color: var(--muted);
-      font-size: 0.95rem;
+      color: rgba(255,255,255,.5);
+      font-size: .95rem;
       font-variant-numeric: tabular-nums;
       margin-bottom: 22px;
     }
@@ -101,67 +81,119 @@
       height: 64px;
       border: none;
       border-radius: 50%;
-      background: var(--primary);
-      color: white;
       font-size: 1.3rem;
       cursor: pointer;
+      color: white;
+      transition: opacity .15s;
     }
 
-    .play:hover {
-      background: var(--primary-hover);
-    }
+    .play:hover { opacity: .85; }
+    .play:active { transform: scale(.95); }
 
     .volume {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--muted);
+      color: rgba(255,255,255,.5);
     }
 
-    .volume input {
-      width: 100%;
+    .volume input { width: 100%; }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+      cursor: pointer;
+      outline: none;
     }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .not-found {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .not-found .emoji { font-size: 3rem; }
+    .not-found p { color: rgba(255,255,255,.5); max-width: 30ch; }
   </style>
 </head>
 <body>
-  <main class="player">
-    <div class="cover">
-      <div class="disc"></div>
-    </div>
 
-    <h1>FC Bayern Goal Song</h1>
-
-    <div class="bar" id="bar">
-      <div class="fill" id="fill"></div>
-    </div>
-
-    <div class="times">
-      <span id="current">0:00</span>
-      <span id="total">0:00</span>
-    </div>
-
+  <div class="player" id="player" style="display:none">
+    <div class="cover" id="cover"></div>
+    <h1 id="title"></h1>
+    <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
+    <div class="times"><span id="current">0:00</span><span id="total">0:00</span></div>
     <div class="controls">
-      <button class="play" id="toggle" aria-label="Abspielen oder pausieren">▶</button>
+      <button class="play" id="toggle" aria-label="Abspielen oder pausieren">&#9654;</button>
     </div>
-
     <div class="volume">
-      <span>🔊</span>
+      <span>&#128266;</span>
       <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Lautstärke">
     </div>
+    <audio id="audio" preload="metadata"></audio>
+  </div>
 
-    <audio id="audio" preload="metadata">
-      <source src="/Fc-Bayern-_NEW_-Goal-song.mp3" type="audio/mpeg">
-    </audio>
-  </main>
+  <div class="not-found" id="notFound">
+    <div class="emoji">&#127932;</div>
+    <h1 style="font-family:'Instrument Serif',serif">Kein Song gefunden</h1>
+    <p>Bitte scanne einen der QR-Codes.</p>
+  </div>
 
   <script>
-    const audio = document.getElementById('audio');
-    const toggle = document.getElementById('toggle');
-    const volume = document.getElementById('volume');
-    const fill = document.getElementById('fill');
-    const bar = document.getElementById('bar');
+    const SONGS = {
+      fcbayern: {
+        title: "FC Bayern München",
+        file: "Fc-Bayern-_NEW_-Goal-song.mp3",
+        emoji: "&#127941;",
+        color: "#c8102e",
+        bg: "#1a0308"
+      },
+      hsv: {
+        title: "HSV Torhymne",
+        file: "HSV Torhymne 20122013 + 20132014 Auf gehts Hamburg - Original _TOP quality_.mp3",
+        emoji: "&#9651;",
+        color: "#009fe3",
+        bg: "#00090f"
+      },
+      mgladbach: {
+        title: "Borussia Mönchengladbach",
+        file: "Torhymne Borussia Mgladbach.mp3",
+        emoji: "&#9899;",
+        color: "#00a650",
+        bg: "#001a0d"
+      },
+      frankfurt: {
+        title: "Eintracht Frankfurt",
+        file: "Torhymne Eintracht Frankfurt [Waldstadion Edit].mp3",
+        emoji: "&#129413;",
+        color: "#e2001a",
+        bg: "#1a0002"
+      }
+    };
+
+    const audio   = document.getElementById('audio');
+    const toggle  = document.getElementById('toggle');
+    const volume  = document.getElementById('volume');
+    const fill    = document.getElementById('fill');
+    const bar     = document.getElementById('bar');
     const current = document.getElementById('current');
-    const total = document.getElementById('total');
+    const total   = document.getElementById('total');
+    const player  = document.getElementById('player');
+    const notFound= document.getElementById('notFound');
+    const cover   = document.getElementById('cover');
+    const titleEl = document.getElementById('title');
 
     const fmt = s => {
       if (isNaN(s)) return '0:00';
@@ -170,22 +202,55 @@
       return `${m}:${String(sec).padStart(2, '0')}`;
     };
 
+    function load() {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const song = SONGS[hash];
+
+      if (!song) {
+        player.style.display = 'none';
+        notFound.style.display = 'flex';
+        document.body.style.background = '#111';
+        return;
+      }
+
+      notFound.style.display = 'none';
+      player.style.display = 'block';
+
+      document.body.style.background =
+        `radial-gradient(circle at top, ${song.color}30, transparent 40%), ${song.bg}`;
+      player.style.background =
+        `linear-gradient(160deg, ${song.color}22, rgba(255,255,255,.03))`;
+      player.style.border = `1px solid ${song.color}40`;
+
+      cover.innerHTML = song.emoji;
+      cover.style.background =
+        `radial-gradient(circle, ${song.color}30, ${song.color}08)`;
+
+      document.querySelector('.fill').style.background = song.color;
+      document.querySelector('.play').style.background = song.color;
+
+      titleEl.textContent = song.title;
+      document.title = song.title + " – Torhymne";
+
+      audio.pause();
+      audio.src = encodeURI(song.file);
+      audio.load();
+      fill.style.width = '0';
+      current.textContent = '0:00';
+      total.textContent = '0:00';
+      toggle.innerHTML = '&#9654;';
+    }
+
     const sync = () => {
-      toggle.textContent = audio.paused ? '▶' : '❚❚';
+      toggle.innerHTML = audio.paused ? '&#9654;' : '&#9646;&#9646;';
     };
 
     toggle.addEventListener('click', async () => {
-      if (audio.paused) {
-        await audio.play();
-      } else {
-        audio.pause();
-      }
+      if (audio.paused) { await audio.play(); } else { audio.pause(); }
       sync();
     });
 
-    volume.addEventListener('input', () => {
-      audio.volume = volume.value;
-    });
+    volume.addEventListener('input', () => audio.volume = +volume.value);
 
     audio.addEventListener('loadedmetadata', () => {
       total.textContent = fmt(audio.duration);
@@ -199,6 +264,7 @@
 
     audio.addEventListener('play', sync);
     audio.addEventListener('pause', sync);
+    audio.addEventListener('ended', sync);
     audio.volume = 0.8;
 
     bar.addEventListener('click', e => {
@@ -206,6 +272,9 @@
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       if (audio.duration) audio.currentTime = pct * audio.duration;
     });
+
+    window.addEventListener('hashchange', load);
+    load();
   </script>
 </body>
 </html>
