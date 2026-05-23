@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Torhymnen Player</title>
+  <title>Musikplayer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
@@ -16,85 +16,117 @@
       place-items: center;
       padding: 24px;
       font-family: "Work Sans", sans-serif;
-      background: #111;
+      background: #0d0d0d;
       color: #f0f0f0;
+      transition: background 0.6s ease;
     }
 
     .player {
-      width: min(100%, 420px);
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.45);
-      text-align: center;
+      width: min(100%, 400px);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.55);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(12px);
     }
 
     .cover {
+      width: 100%;
       aspect-ratio: 1;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 22px;
-      border: 1px solid rgba(255,255,255,.08);
-      font-size: 5rem;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meta {
+      margin-bottom: 18px;
+    }
+
+    .composer {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,.5);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 4px;
     }
 
     h1 {
       font-family: "Instrument Serif", serif;
-      font-size: clamp(1.6rem, 1.1rem + 1.2vw, 2.2rem);
-      margin-bottom: 22px;
+      font-size: clamp(1.5rem, 1rem + 1.2vw, 2rem);
       line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,.45);
+      font-style: italic;
     }
 
     .bar {
-      height: 8px;
+      height: 5px;
       background: rgba(255,255,255,.1);
       border-radius: 999px;
       overflow: hidden;
       cursor: pointer;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      margin-top: 18px;
     }
 
     .fill {
       height: 100%;
       width: 0;
       border-radius: 999px;
+      background: rgba(255,255,255,.8);
       transition: width .1s linear;
     }
 
     .times {
       display: flex;
       justify-content: space-between;
-      color: rgba(255,255,255,.5);
-      font-size: .95rem;
+      color: rgba(255,255,255,.4);
+      font-size: .82rem;
       font-variant-numeric: tabular-nums;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .controls {
       display: flex;
       justify-content: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .play {
-      width: 64px;
-      height: 64px;
+      width: 60px;
+      height: 60px;
       border: none;
       border-radius: 50%;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      color: white;
-      transition: opacity .15s;
+      color: #0d0d0d;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,.3);
+      transition: transform .1s, opacity .15s;
     }
 
-    .play:hover { opacity: .85; }
-    .play:active { transform: scale(.95); }
+    .play:hover { opacity: .88; }
+    .play:active { transform: scale(.94); }
 
     .volume {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: rgba(255,255,255,.5);
+      gap: 10px;
+      color: rgba(255,255,255,.4);
+      font-size: .9rem;
     }
 
     .volume input { width: 100%; }
@@ -122,135 +154,136 @@
       align-items: center;
       gap: 16px;
       text-align: center;
+      color: rgba(255,255,255,.5);
     }
 
-    .not-found .emoji { font-size: 3rem; }
-    .not-found p { color: rgba(255,255,255,.5); max-width: 30ch; }
+    .not-found .icon { font-size: 3rem; }
+    .not-found h2 { font-family: "Instrument Serif", serif; font-size: 1.6rem; color: #f0f0f0; }
+    .not-found p { max-width: 28ch; font-size: .9rem; }
   </style>
 </head>
 <body>
 
   <div class="player" id="player" style="display:none">
-    <div class="cover" id="cover"></div>
-    <h1 id="title"></h1>
+    <div class="cover">
+      <img id="coverImg" src="" alt="Cover" width="400" height="400" loading="eager">
+    </div>
+
+    <div class="meta">
+      <div class="composer" id="composer"></div>
+      <h1 id="title"></h1>
+      <div class="subtitle" id="subtitle"></div>
+    </div>
+
     <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
     <div class="times"><span id="current">0:00</span><span id="total">0:00</span></div>
+
     <div class="controls">
       <button class="play" id="toggle" aria-label="Abspielen oder pausieren">&#9654;</button>
     </div>
+
     <div class="volume">
       <span>&#128266;</span>
       <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Lautstärke">
     </div>
+
     <audio id="audio" preload="metadata"></audio>
   </div>
 
   <div class="not-found" id="notFound">
-    <div class="emoji">&#127932;</div>
-    <h1 style="font-family:'Instrument Serif',serif">Kein Song gefunden</h1>
+    <div class="icon">&#127926;</div>
+    <h2>Kein Stück gefunden</h2>
     <p>Bitte scanne einen der QR-Codes.</p>
   </div>
 
   <script>
     const SONGS = {
-      fcbayern: {
-        title: "FC Bayern München",
-        file: "Fc-Bayern-_NEW_-Goal-song.mp3",
-        emoji: "&#127941;",
-        color: "#c8102e",
-        bg: "#1a0308"
+      mondschein: {
+        composer: "Ludwig van Beethoven",
+        title: "Mondscheinsonate",
+        subtitle: "1. Satz – Adagio sostenuto",
+        file: "mondscheinsonate-1satz.mp3",
+        cover: "ChatGPT Image 19. Mai 2026, 09_31_28.png",
+        bg: "#05080f"
       },
-      hsv: {
-        title: "HSV Torhymne",
-        file: "HSV Torhymne 20122013 + 20132014 Auf gehts Hamburg - Original _TOP quality_.mp3",
-        emoji: "&#9651;",
-        color: "#009fe3",
-        bg: "#00090f"
+      herbstlied: {
+        composer: "Felix Mendelssohn Bartholdy",
+        title: "Herbstlied",
+        subtitle: "Für zwei Trompeten",
+        file: "herbstlied-mendelssohn-bartholdy.mp3",
+        cover: "ChatGPT Image 18. Mai 2026, 09_41_17.png",
+        bg: "#120a02"
       },
-      mgladbach: {
-        title: "Borussia Mönchengladbach",
-        file: "Torhymne Borussia Mgladbach.mp3",
-        emoji: "&#9899;",
-        color: "#00a650",
-        bg: "#001a0d"
-      },
-      frankfurt: {
-        title: "Eintracht Frankfurt",
-        file: "Torhymne Eintracht Frankfurt [Waldstadion Edit].mp3",
-        emoji: "&#129413;",
-        color: "#e2001a",
-        bg: "#1a0002"
+      cantabile: {
+        composer: "George Enescu",
+        title: "Cantabile et Presto",
+        subtitle: "Für Flöte und Klavier",
+        file: "Cantabile er Presto George Enescu.mp3",
+        cover: "ChatGPT Image 18. Mai 2026, 12_17_02.png",
+        bg: "#05080f"
       }
     };
 
-    const audio   = document.getElementById('audio');
-    const toggle  = document.getElementById('toggle');
-    const volume  = document.getElementById('volume');
-    const fill    = document.getElementById('fill');
-    const bar     = document.getElementById('bar');
-    const current = document.getElementById('current');
-    const total   = document.getElementById('total');
-    const player  = document.getElementById('player');
-    const notFound= document.getElementById('notFound');
-    const cover   = document.getElementById('cover');
-    const titleEl = document.getElementById('title');
+    const audio    = document.getElementById('audio');
+    const toggle   = document.getElementById('toggle');
+    const volInput = document.getElementById('volume');
+    const fill     = document.getElementById('fill');
+    const bar      = document.getElementById('bar');
+    const current  = document.getElementById('current');
+    const total    = document.getElementById('total');
+    const player   = document.getElementById('player');
+    const notFound = document.getElementById('notFound');
+    const coverImg = document.getElementById('coverImg');
+    const composer = document.getElementById('composer');
+    const titleEl  = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
 
     const fmt = s => {
-      if (isNaN(s)) return '0:00';
-      const m = Math.floor(s / 60);
-      const sec = Math.floor(s % 60);
-      return `${m}:${String(sec).padStart(2, '0')}`;
+      if (!s || isNaN(s)) return '0:00';
+      return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
     };
 
     function load() {
-      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const hash = window.location.hash.replace('#','').toLowerCase();
       const song = SONGS[hash];
 
       if (!song) {
         player.style.display = 'none';
         notFound.style.display = 'flex';
-        document.body.style.background = '#111';
+        document.body.style.background = '#0d0d0d';
         return;
       }
 
       notFound.style.display = 'none';
       player.style.display = 'block';
+      document.body.style.background = song.bg;
+      document.title = song.title + ' – ' + song.composer;
 
-      document.body.style.background =
-        `radial-gradient(circle at top, ${song.color}30, transparent 40%), ${song.bg}`;
-      player.style.background =
-        `linear-gradient(160deg, ${song.color}22, rgba(255,255,255,.03))`;
-      player.style.border = `1px solid ${song.color}40`;
-
-      cover.innerHTML = song.emoji;
-      cover.style.background =
-        `radial-gradient(circle, ${song.color}30, ${song.color}08)`;
-
-      document.querySelector('.fill').style.background = song.color;
-      document.querySelector('.play').style.background = song.color;
-
-      titleEl.textContent = song.title;
-      document.title = song.title + " – Torhymne";
+      composer.textContent = song.composer;
+      titleEl.textContent  = song.title;
+      subtitle.textContent = song.subtitle;
+      coverImg.src = encodeURI(song.cover);
+      coverImg.alt = song.title;
 
       audio.pause();
       audio.src = encodeURI(song.file);
       audio.load();
       fill.style.width = '0';
       current.textContent = '0:00';
-      total.textContent = '0:00';
-      toggle.innerHTML = '&#9654;';
+      total.textContent   = '0:00';
+      toggle.innerHTML    = '&#9654;';
     }
 
-    const sync = () => {
+    const syncBtn = () => {
       toggle.innerHTML = audio.paused ? '&#9654;' : '&#9646;&#9646;';
     };
 
     toggle.addEventListener('click', async () => {
       if (audio.paused) { await audio.play(); } else { audio.pause(); }
-      sync();
+      syncBtn();
     });
 
-    volume.addEventListener('input', () => audio.volume = +volume.value);
+    volInput.addEventListener('input', () => audio.volume = +volInput.value);
 
     audio.addEventListener('loadedmetadata', () => {
       total.textContent = fmt(audio.duration);
@@ -262,15 +295,15 @@
       current.textContent = fmt(audio.currentTime);
     });
 
-    audio.addEventListener('play', sync);
-    audio.addEventListener('pause', sync);
-    audio.addEventListener('ended', sync);
+    audio.addEventListener('play',  syncBtn);
+    audio.addEventListener('pause', syncBtn);
+    audio.addEventListener('ended', syncBtn);
     audio.volume = 0.8;
 
     bar.addEventListener('click', e => {
-      const rect = bar.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      if (audio.duration) audio.currentTime = pct * audio.duration;
+      const r = bar.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      if (audio.duration) audio.currentTime = p * audio.duration;
     });
 
     window.addEventListener('hashchange', load);
