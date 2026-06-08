@@ -47,9 +47,7 @@
       display: block;
     }
 
-    .meta {
-      margin-bottom: 18px;
-    }
+    .meta { margin-bottom: 18px; }
 
     .composer {
       font-size: 0.85rem;
@@ -72,23 +70,53 @@
       font-style: italic;
     }
 
-    .bar {
-      height: 5px;
-      background: rgba(255,255,255,.1);
-      border-radius: 999px;
-      overflow: hidden;
+    /* Scrubber */
+    .scrubber {
+      position: relative;
+      height: 20px;
+      display: flex;
+      align-items: center;
       cursor: pointer;
-      margin-bottom: 6px;
       margin-top: 18px;
+      margin-bottom: 6px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .track {
+      position: absolute;
+      left: 0; right: 0;
+      height: 5px;
+      background: rgba(255,255,255,.12);
+      border-radius: 999px;
     }
 
     .fill {
       height: 100%;
       width: 0;
       border-radius: 999px;
-      background: rgba(255,255,255,.8);
+      background: rgba(255,255,255,.85);
       transition: width .1s linear;
     }
+
+    .thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 6px rgba(0,0,0,.5);
+      transform: translateX(-50%);
+      left: 0%;
+      transition: left .1s linear, width .15s, height .15s;
+      pointer-events: none;
+    }
+
+    .scrubber:hover .thumb,
+    .scrubber.dragging .thumb { width: 20px; height: 20px; }
+
+    .scrubber.dragging .fill,
+    .scrubber.dragging .thumb { transition: none; }
 
     .times {
       display: flex;
@@ -175,7 +203,13 @@
       <div class="subtitle" id="subtitle"></div>
     </div>
 
-    <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
+    <div class="scrubber" id="scrubber">
+      <div class="track">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="thumb" id="thumb"></div>
+    </div>
+
     <div class="times"><span id="current">0:00</span><span id="total">0:00</span></div>
 
     <div class="controls">
@@ -221,6 +255,14 @@
         file: "Cantabile er Presto George Enescu.mp3",
         cover: "ChatGPT Image 19. Mai 2026, 09_31_28.png",
         bg: "#05080f"
+      },
+      spain: {
+        composer: "Chick Corea",
+        title: "Spain",
+        subtitle: "Piano Solo",
+        file: "Spain.m4a",
+        cover: "Spain.jpeg",
+        bg: "#1a0800"
       }
     };
 
@@ -228,7 +270,8 @@
     const toggle   = document.getElementById('toggle');
     const volInput = document.getElementById('volume');
     const fill     = document.getElementById('fill');
-    const bar      = document.getElementById('bar');
+    const thumb    = document.getElementById('thumb');
+    const scrubber = document.getElementById('scrubber');
     const current  = document.getElementById('current');
     const total    = document.getElementById('total');
     const player   = document.getElementById('player');
@@ -242,6 +285,60 @@
       if (!s || isNaN(s)) return '0:00';
       return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
     };
+
+    function setScrubberPos(pct) {
+      fill.style.width = pct + '%';
+      thumb.style.left = pct + '%';
+    }
+
+    function getPct(clientX) {
+      const r = scrubber.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * 100;
+    }
+
+    let dragging = false;
+    let wasPlaying = false;
+
+    function startDrag(clientX) {
+      dragging = true;
+      wasPlaying = !audio.paused;
+      if (wasPlaying) audio.pause();
+      scrubber.classList.add('dragging');
+      const pct = getPct(clientX);
+      setScrubberPos(pct);
+      current.textContent = fmt((pct / 100) * (audio.duration || 0));
+    }
+
+    function moveDrag(clientX) {
+      if (!dragging) return;
+      const pct = getPct(clientX);
+      setScrubberPos(pct);
+      current.textContent = fmt((pct / 100) * (audio.duration || 0));
+    }
+
+    function endDrag(clientX) {
+      if (!dragging) return;
+      dragging = false;
+      scrubber.classList.remove('dragging');
+      const pct = getPct(clientX);
+      if (audio.duration) audio.currentTime = (pct / 100) * audio.duration;
+      if (wasPlaying) audio.play();
+    }
+
+    scrubber.addEventListener('mousedown',  e => { e.preventDefault(); startDrag(e.clientX); });
+    document.addEventListener('mousemove',  e => moveDrag(e.clientX));
+    document.addEventListener('mouseup',    e => endDrag(e.clientX));
+
+    scrubber.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX); }, { passive: false });
+    document.addEventListener('touchmove',  e => { if (dragging) { e.preventDefault(); moveDrag(e.touches[0].clientX); } }, { passive: false });
+    document.addEventListener('touchend',   e => endDrag(e.changedTouches[0].clientX));
+
+    audio.addEventListener('timeupdate', () => {
+      if (dragging) return;
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      setScrubberPos(pct);
+      current.textContent = fmt(audio.currentTime);
+    });
 
     function load() {
       const hash = window.location.hash.replace('#','').toLowerCase();
@@ -268,7 +365,7 @@
       audio.pause();
       audio.src = encodeURI(song.file);
       audio.load();
-      fill.style.width = '0';
+      setScrubberPos(0);
       current.textContent = '0:00';
       total.textContent   = '0:00';
       toggle.innerHTML    = '&#9654;';
@@ -284,27 +381,11 @@
     });
 
     volInput.addEventListener('input', () => audio.volume = +volInput.value);
-
-    audio.addEventListener('loadedmetadata', () => {
-      total.textContent = fmt(audio.duration);
-    });
-
-    audio.addEventListener('timeupdate', () => {
-      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-      fill.style.width = pct + '%';
-      current.textContent = fmt(audio.currentTime);
-    });
-
+    audio.addEventListener('loadedmetadata', () => { total.textContent = fmt(audio.duration); });
     audio.addEventListener('play',  syncBtn);
     audio.addEventListener('pause', syncBtn);
     audio.addEventListener('ended', syncBtn);
     audio.volume = 0.8;
-
-    bar.addEventListener('click', e => {
-      const r = bar.getBoundingClientRect();
-      const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-      if (audio.duration) audio.currentTime = p * audio.duration;
-    });
 
     window.addEventListener('hashchange', load);
     load();
